@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+	MyketBilling_UPL.xml
+
+	Wires MyketBillingBridge.java and the official Myket billing SDK into the
+	generated Android Gradle project. Referenced from MyketBilling.Build.cs via
+	AdditionalPropertiesForReceipt["AndroidPlugin"].
+
+	NOTE: tag names below follow the UPL schema as of UE5.x. If your exact 5.8
+	build renamed anything, check <EngineDir>/Build/Android/UPL.md and the sample
+	xml files under a few Engine plugins (e.g. GooglePAD, EOSShared) for reference.
+-->
+<root xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<init>
+		<log text="MyketBilling UPL init" />
+	</init>
+
+	<!-- Permission required to bind to Myket's in-app billing service. -->
+	<androidManifestUpdates>
+		<addPermission android:name="ir.mservices.market.BILLING" />
+	</androidManifestUpdates>
+
+	<!-- JitPack repository + the official myket-billing-client dependency.
+	     Bump the version string below to whatever is current on
+	     https://github.com/myketstore/myket-billing-client releases. -->
+	<buildGradleAdditions>
+		<insert>
+			<![CDATA[
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+android {
+    defaultConfig {
+        manifestPlaceholders += [
+            marketApplicationId: "ir.mservices.market",
+            marketBindAddress  : "ir.mservices.market.InAppBillingService.BIND",
+            marketPermission   : "ir.mservices.market.BILLING"
+        ]
+    }
+}
+
+dependencies {
+    implementation 'com.github.myketstore:myket-billing-client:1.19'
+}
+			]]>
+		</insert>
+	</buildGradleAdditions>
+
+	<!-- Copy our Java bridge source into the generated Gradle project, preserving
+	     its package folder structure (Java/com/myket/billing/MyketBillingBridge.java
+	     -> <gradle src>/com/myket/billing/MyketBillingBridge.java). -->
+	<resourceCopies>
+		<copyDir src="$S(PluginDir)/Java" dst="$S(BuildDir)/src" />
+	</resourceCopies>
+
+	<!-- Hook GameActivity.java so the bridge always has a current Activity and
+	     so purchase results (which arrive via onActivityResult) reach IabHelper. -->
+	<gameActivityImportAdditions>
+		<insert>
+			<![CDATA[
+import com.myket.billing.MyketBillingBridge;
+			]]>
+		</insert>
+	</gameActivityImportAdditions>
+
+	<gameActivityOnCreateAdditions>
+		<insert>
+			<![CDATA[
+MyketBillingBridge.setActivity(this);
+			]]>
+		</insert>
+	</gameActivityOnCreateAdditions>
+
+	<gameActivityOnDestroyAdditions>
+		<insert>
+			<![CDATA[
+MyketBillingBridge.onDestroy(this);
+			]]>
+		</insert>
+	</gameActivityOnDestroyAdditions>
+
+</root>
