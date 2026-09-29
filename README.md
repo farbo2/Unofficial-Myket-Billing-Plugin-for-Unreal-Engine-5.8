@@ -28,6 +28,15 @@ The Android billing implementation is handled internally by the plugin. Your Unr
 The complete billing flow should be tested on a real Android device.
 
 ---
+## Video Tutorial
+
+### Myket In-App Billing Plugin for Unreal Engine 5
+
+[![Watch the tutorial](https://img.youtube.com/vi/cul2t-W3c6w/maxresdefault.jpg)](https://youtu.be/cul2t-W3c6w)
+
+** Watch the full tutorial to learn how to install, configure, and integrate the Myket In-App Billing plugin into your Unreal Engine 5 project.**
+
+This video provides a practical walkthrough of the plugin setup and billing implementation.
 
 # Installation
 
